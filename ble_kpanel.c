@@ -41,7 +41,6 @@ static void on_disconnect(ble_kpanel_t * p_kpanel, ble_evt_t const * p_ble_evt)
 static void on_write(ble_kpanel_t * p_kpanel, ble_evt_t const * p_ble_evt)
 {
     ble_gatts_evt_write_t const * p_evt_write = &p_ble_evt->evt.gatts_evt.params.write;
-
     if (p_evt_write->handle == p_kpanel->panel_value_handles.value_handle) {
         NRF_LOG_DEBUG("Panel Info %d %d", p_evt_write->data[0], p_evt_write->data[1]);
     }

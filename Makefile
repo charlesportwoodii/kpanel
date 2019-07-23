@@ -5,7 +5,7 @@ rwildcard = $(foreach d,$(wildcard $1*),$(call rwildcard,$d/,$2) $(filter $(subs
 
 default: check-env
 ifneq ($(filter $(BOARD),$(BOARD_LIST)),)
-	$(MAKE) merge -C boards/$(BOARD)
+	$(MAKE) -C boards/$(BOARD)
 else
 	$(error Run `make` with a board specified: ($(BOARD_LIST)))
 endif
