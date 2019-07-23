@@ -66,12 +66,10 @@ extern "C" {
 #define RTS_PIN_NUMBER 0xFFFFFFFF  //NC
 #define HWFC           false
 
-#define BSP_QSPI_SCK_PIN   19
-#define BSP_QSPI_CSN_PIN   17
-#define BSP_QSPI_IO0_PIN   20
-#define BSP_QSPI_IO1_PIN   21
-#define BSP_QSPI_IO2_PIN   22
-#define BSP_QSPI_IO3_PIN   23
+#define SPI_SS      NRF_GPIO_PIN_MAP(0,31)
+#define SPI_SCK     NRF_GPIO_PIN_MAP(1,15)
+#define SPI_MOSI    NRF_GPIO_PIN_MAP(1,13)
+#define SPI_MISO    NRF_GPIO_PIN_MAP(1,14)
 
 #ifdef __cplusplus
 }
