@@ -34,11 +34,13 @@ extern "C" {
 
 #include "nrf_gpio.h"
 
-#define ENCODER_1A  NRF_GPIO_PIN_MAP(0,4)
-#define ENCODER_1B  NRF_GPIO_PIN_MAP(0,28)
+#define ENCODER_1TOGGLE     NRF_GPIO_PIN_MAP(0,3)   // A0
+#define ENCODER_1A          NRF_GPIO_PIN_MAP(0,4)   // A1
+#define ENCODER_1B          NRF_GPIO_PIN_MAP(0,28)  // A2
 
-#define ENCODER_2A  NRF_GPIO_PIN_MAP(0,29)
-#define ENCODER_2B  NRF_GPIO_PIN_MAP(0,30)
+#define ENCODER_2TOGGLE     NRF_GPIO_PIN_MAP(0,29)  // A3
+#define ENCODER_2A          NRF_GPIO_PIN_MAP(0,30)  // A4
+#define ENCODER_2B          NRF_GPIO_PIN_MAP(0,31)  // A5
 
 #ifdef __cplusplus
 }

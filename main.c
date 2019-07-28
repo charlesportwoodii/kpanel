@@ -83,8 +83,7 @@
 #include "nrf_svci_async_function.h"
 #include "nrf_svci_async_handler.h"
 
-#include "nrf_drv_gpiote.h"
-#include "nrf_gpiote.h"
+#include "kpanel_panel.h"
 #include "ble_kpanel.h"
 #include "panel.h"
 
@@ -797,49 +796,6 @@ static void advertising_start(bool erase_bonds)
     }
 }
 
-/**
- * @brief Interrupt handler for GPIOTE pin
- */
-void in_pin_handler(nrf_drv_gpiote_pin_t pin, nrf_gpiote_polarity_t action)
-{
-    NRF_LOG_DEBUG("GPIOTE trigger for pin: %d", (uint32_t)pin);
-}
-
-/**
- * @brief Function for configuring GPIOTE to give an interrupt on pin change.
- */
-static void gpiote_init(void)
-{
-    NRF_LOG_INFO("Gpiote initialized");
-    ret_code_t err_code;
-
-    err_code = nrf_drv_gpiote_init();
-    APP_ERROR_CHECK(err_code);
-
-    gpiote_init_pin(ENCODER_1A);
-    gpiote_init_pin(ENCODER_1B);
-    gpiote_init_pin(ENCODER_2A);
-    gpiote_init_pin(ENCODER_2B);
-}
-
-
-/**
- * @brief Function to initialize a given pin
- */
-void gpiote_init_pin(uint32_t pin)
-{
-    ret_code_t err_code;
-    nrf_drv_gpiote_in_config_t in_config = GPIOTE_CONFIG_IN_SENSE_TOGGLE(true);
-    in_config.pull = NRF_GPIO_PIN_PULLUP; // Maybe NRF_GPIO_PIN_PULLDOWN for HIGH, currently GND
-
-    err_code = nrf_drv_gpiote_in_init(pin, &in_config, in_pin_handler);
-    APP_ERROR_CHECK(err_code);
-
-    nrf_drv_gpiote_in_event_enable(pin, true);
-
-    NRF_LOG_INFO("Pin %s gpiote event created", pin);
-}
-
 
 /**@brief Function for application main entry.
  */
@@ -849,11 +805,12 @@ int main(void)
     ret_code_t err_code;
 
     log_init();
-    gpiote_init();
 
     // Initialize the async SVCI interface to bootloader before any interrupts are enabled.
     err_code = ble_dfu_buttonless_async_svci_init();
     APP_ERROR_CHECK(err_code);
+
+    kpanel_init();
 
     timers_init();
     buttons_leds_init(&erase_bonds);

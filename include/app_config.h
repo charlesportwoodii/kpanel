@@ -35,6 +35,14 @@ extern "C" {
 #define NRF_SDH_LOG_LEVEL 4
 #endif
 
+#ifndef QDEC_CONFIG_LOG_ENABLED
+#define QDEC_CONFIG_LOG_ENABLED 0
+#endif
+
+#ifndef QDEC_CONFIG_LOG_LEVEL
+#define QDEC_CONFIG_LOG_LEVEL 3
+#endif
+
 #endif // DEBUG
 
 #ifdef __cplusplus
