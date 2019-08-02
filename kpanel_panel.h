@@ -24,6 +24,14 @@ typedef struct
  */
 static volatile kpanel_t kpanel_settings;
 
+/**@brief Gets the PWM settings based upon the brightness and temperature
+ * @param[in] brightness    The brightness level (0-255)
+ * @param[in] temperature   The temperature level (0-255)
+ * @param[out] pma_a        PWM A set for color and brightness
+ * @param[out] pma_b        PWM B set for color and brightness
+ */
+void kpanel_get_pwm(uint8_t brightness, uint8_t temperature, uint8_t *pwm_a, uint8_t *pwm_b);
+
 /**@brief Setings the panel brightness and temperature
  * @param[in] brightness    The brightness level (0-255)
  * @param[in] temperature   The temperature level (0-255)

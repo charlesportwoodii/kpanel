@@ -4,6 +4,19 @@
 #include "nrfx_qdec.h"
 #include "nrf_drv_qdec.h"
 #include "panel.h"
+#include <stdio.h>
+#include <math.h>
+
+void kpanel_get_pwm(uint8_t brightness, uint8_t temperature, uint8_t *pwm_a, uint8_t *pwm_b)
+{
+    uint8_t a = ceil((double)temperature * 100 / 256);
+    uint8_t b = 100 - (int)a;
+
+    double brightnessFactor = ((double)brightness * 100 / 256) / 100;
+
+    (*pwm_a) = ceil((double)a * brightnessFactor);
+    (*pwm_b) = ceil((double)b * brightnessFactor);
+}
 
 void kpanel_set(uint8_t brightness, uint8_t temperature)
 {
@@ -13,9 +26,15 @@ void kpanel_set(uint8_t brightness, uint8_t temperature)
     kpanel_settings.temperature = temperature;
     kpanel_settings.brightness = brightness;
 
-    NRF_LOG_DEBUG("Settings changed: brightness: %d, color_temp: %d",
+    uint8_t pwm_a = 0;
+    uint8_t pwm_b = 0;
+    kpanel_get_pwm(brightness, temperature, &pwm_a, &pwm_b);
+
+    NRF_LOG_DEBUG("Settings changed: brightness: %d, color_temp: %d, pwm_a: %d, pwm_b: %d",
         kpanel_settings.brightness,
-        kpanel_settings.temperature
+        kpanel_settings.temperature,
+        pwm_a,
+        pwm_b
     );
 }
 
