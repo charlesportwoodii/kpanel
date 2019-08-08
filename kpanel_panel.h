@@ -66,6 +66,10 @@ void kpanel_goiote_init_pin(uint8_t pin);
  */
 kpanel_t kpanel_get_settings();
 
+/**@brief Initializes PWM inputs
+ */
+void kpanel_pwm_init();
+
 /**@brief Entrypoint
  */
 void kpanel_init(void);

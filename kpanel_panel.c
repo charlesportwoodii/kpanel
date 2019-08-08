@@ -3,9 +3,27 @@
 #include "nrfx_gpiote.h"
 #include "nrfx_qdec.h"
 #include "nrf_drv_qdec.h"
+#include "app_pwm.h"
+#include "nrf_gpio.h"
+#include "nrf_delay.h"
 #include "panel.h"
 #include <stdio.h>
 #include <math.h>
+
+APP_PWM_INSTANCE(PWM0, 1);
+APP_PWM_INSTANCE(PWM1, 2);
+
+
+/**@brief Ready callback for PWM
+ *
+ * @param[in] pwm_id    The PWM id
+ *
+ * @return      void
+ */
+static void pwm_ready_callback(uint32_t pwm_id)
+{
+    return;
+}
 
 void kpanel_get_pwm(uint8_t brightness, uint8_t temperature, uint8_t *pwm_a, uint8_t *pwm_b)
 {
@@ -30,6 +48,10 @@ void kpanel_set(uint8_t brightness, uint8_t temperature)
     uint8_t pwm_b = 0;
     kpanel_get_pwm(brightness, temperature, &pwm_a, &pwm_b);
 
+    // Set the PWM values for both colors
+    while (app_pwm_channel_duty_set(&PWM0, 0, pwm_a) == NRF_ERROR_BUSY);
+    while (app_pwm_channel_duty_set(&PWM1, 0, pwm_b) == NRF_ERROR_BUSY);
+
     NRF_LOG_DEBUG("Settings changed: brightness: %d, color_temp: %d, pwm_a: %d, pwm_b: %d",
         kpanel_settings.brightness,
         kpanel_settings.temperature,
@@ -53,7 +75,7 @@ void kpanel_set_by_factor(uint8_t mode, bool increase, uint8_t factor)
 static void kpanel_qdec_handler(nrf_drv_qdec_event_t event)
 {
     if (event.type == NRF_QDEC_EVENT_REPORTRDY) {
-        kpanel_set_by_factor(kpanel_settings.mode, (event.data.report.acc >= 1), 2);
+        kpanel_set_by_factor(kpanel_settings.mode, (event.data.report.acc >= 1), 4);
     }
 }
 
@@ -107,6 +129,29 @@ kpanel_t kpanel_get_settings()
     return kpanel_settings;
 }
 
+void kpanel_pwm_init()
+{
+    nrf_gpio_cfg_output(KPANEL_PWM0);
+    nrf_gpio_cfg_output(KPANEL_PWM1);
+
+    ret_code_t err_code;
+    app_pwm_config_t pwm1_cfg = APP_PWM_DEFAULT_CONFIG_1CH(5000L, KPANEL_PWM0);
+    app_pwm_config_t pwm2_cfg = APP_PWM_DEFAULT_CONFIG_1CH(5000L, KPANEL_PWM1);
+
+    // Switch the polarity of the second channel.
+    pwm1_cfg.pin_polarity[0] = APP_PWM_POLARITY_ACTIVE_HIGH;
+    pwm2_cfg.pin_polarity[0] = APP_PWM_POLARITY_ACTIVE_HIGH;
+
+    // Initialize and enable PWM.
+    err_code = app_pwm_init(&PWM0, &pwm1_cfg,pwm_ready_callback);
+    APP_ERROR_CHECK(err_code);
+    app_pwm_enable(&PWM0);
+
+    err_code = app_pwm_init(&PWM1, &pwm2_cfg,pwm_ready_callback);
+    APP_ERROR_CHECK(err_code);
+    app_pwm_enable(&PWM1);
+}
+
 void kpanel_init(void)
 {
     ret_code_t err_code;
@@ -119,6 +164,9 @@ void kpanel_init(void)
     kpanel_settings.temperature = 0;
     kpanel_settings.brightness = 0;
 
+    kpanel_pwm_init();
+
     kpanel_goiote_init_pin(ENCODER_1TOGGLE);
     kpanel_goiote_init_pin(ENCODER_2TOGGLE);
+
 }

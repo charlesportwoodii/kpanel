@@ -34,16 +34,16 @@ extern "C" {
 
 #include "nrf_gpio.h"
 
-#define ENCODER_1TOGGLE     NRF_GPIO_PIN_MAP(0,3)   // A0
-#define ENCODER_1A          NRF_GPIO_PIN_MAP(0,4)   // A1
-#define ENCODER_1B          NRF_GPIO_PIN_MAP(0,28)  // A2
+#define ENCODER_1TOGGLE     NRF_GPIO_PIN_MAP(0,4)  // P4
+#define ENCODER_1A          NRF_GPIO_PIN_MAP(0,5)  // P5
+#define ENCODER_1B          NRF_GPIO_PIN_MAP(0,6)  // P6
 
-#define ENCODER_2TOGGLE     NRF_GPIO_PIN_MAP(0,29)  // A3
-#define ENCODER_2A          NRF_GPIO_PIN_MAP(0,30)  // A4
-#define ENCODER_2B          NRF_GPIO_PIN_MAP(0,31)  // A5
+#define ENCODER_2TOGGLE     NRF_GPIO_PIN_MAP(0,7)  // P7
+#define ENCODER_2A          NRF_GPIO_PIN_MAP(0,8)  // P8
+#define ENCODER_2B          NRF_GPIO_PIN_MAP(0,9)  // P9
 
-#define KPANEL_PWM0         NRF_GPIO_PIN_MAP(1,03)  // D8
-#define KPANEL_PWM1         NRF_GPIO_PIN_MAP(1,12)  // D7
+#define KPANEL_PWM0         NRF_GPIO_PIN_MAP(0,10) // P10
+#define KPANEL_PWM1         NRF_GPIO_PIN_MAP(0,3)  // P3
 
 #ifdef __cplusplus
 }
