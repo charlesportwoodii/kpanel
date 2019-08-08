@@ -75,7 +75,7 @@ void kpanel_set_by_factor(uint8_t mode, bool increase, uint8_t factor)
 static void kpanel_qdec_handler(nrf_drv_qdec_event_t event)
 {
     if (event.type == NRF_QDEC_EVENT_REPORTRDY) {
-        kpanel_set_by_factor(kpanel_settings.mode, (event.data.report.acc >= 1), 4);
+        kpanel_set_by_factor(kpanel_settings.mode, (event.data.report.acc >= 1), 8);
     }
 }
 
