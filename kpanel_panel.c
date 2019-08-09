@@ -10,9 +10,12 @@
 #include <stdio.h>
 #include <math.h>
 
+#define KPANEL_SETTINGS_MEMADDR 0x2000F000
+
+static uint32_t* kps_mem = ((uint32_t*) KPANEL_SETTINGS_MEMADDR);
+
 APP_PWM_INSTANCE(PWM0, 1);
 APP_PWM_INSTANCE(PWM1, 2);
-
 
 /**@brief Ready callback for PWM
  *
@@ -20,13 +23,18 @@ APP_PWM_INSTANCE(PWM1, 2);
  *
  * @return      void
  */
-static void pwm_ready_callback(uint32_t pwm_id)
+static void kpanel_pwm_ready_callback(uint32_t pwm_id)
 {
     return;
 }
 
 void kpanel_get_pwm(uint8_t brightness, uint8_t temperature, uint8_t *pwm_a, uint8_t *pwm_b)
 {
+    // Backup settings into ram retention to recover BLE 0x26 and other soft-reset / low power things
+    uint32_t tstore = (temperature << 16);
+    uint32_t bstore = (brightness << 8);
+    (*kps_mem) = tstore | bstore;
+
     uint8_t a = ceil((double)temperature * 100 / 256);
     uint8_t b = 100 - (int)a;
 
@@ -143,11 +151,11 @@ void kpanel_pwm_init()
     pwm2_cfg.pin_polarity[0] = APP_PWM_POLARITY_ACTIVE_HIGH;
 
     // Initialize and enable PWM.
-    err_code = app_pwm_init(&PWM0, &pwm1_cfg,pwm_ready_callback);
+    err_code = app_pwm_init(&PWM0, &pwm1_cfg, kpanel_pwm_ready_callback);
     APP_ERROR_CHECK(err_code);
     app_pwm_enable(&PWM0);
 
-    err_code = app_pwm_init(&PWM1, &pwm2_cfg,pwm_ready_callback);
+    err_code = app_pwm_init(&PWM1, &pwm2_cfg, kpanel_pwm_ready_callback);
     APP_ERROR_CHECK(err_code);
     app_pwm_enable(&PWM1);
 }
@@ -159,10 +167,19 @@ void kpanel_init(void)
     err_code = nrf_drv_gpiote_init();
     APP_ERROR_CHECK(err_code);
 
+    // Recover settings from memory in the event of low-power / soft-reset
+    uint32_t temperature = ((*kps_mem) >> 16) & 0xFF;
+    uint32_t brightness = ((*kps_mem) >> 8) & 0xFF;
+
+    NRF_LOG_DEBUG("Restoring settings from memory %d, %d.", temperature, brightness);
+
     kpanel_settings.mode = 0;
     kpanel_settings.mode_enabled = false;
-    kpanel_settings.temperature = 128;
-    kpanel_settings.brightness = 64;
+    kpanel_settings.temperature = temperature == 0 ? 128 : temperature;
+    kpanel_settings.brightness = brightness == 0 ? 64 : brightness;
+
+    // Zero the ram retention
+    (*kps_mem) = 0;
 
     kpanel_pwm_init();
 

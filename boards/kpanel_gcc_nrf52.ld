@@ -8,6 +8,18 @@ MEMORY
   FLASH (rx) : ORIGIN = 0x26000, LENGTH = 0xda000
   RAM (rwx) :  ORIGIN = 0x20002230, LENGTH = 0x3DDD0
   uicr_bootloader_start_address (r) : ORIGIN = 0x10001014, LENGTH = 0x4
+
+  NO_INIT (rwx) :  ORIGIN = 0x2000F000, LENGTH = 0x04
+}
+
+SECTIONS
+{
+  .no_init (NOLOAD):
+  {
+    PROVIDE(__start_no_init_data = .);
+    KEEP(*(SORT(.no_init*)))
+    PROVIDE(__stop_no_init_data = .);
+  } > NO_INIT
 }
 
 SECTIONS
